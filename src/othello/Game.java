@@ -208,6 +208,7 @@ public class Game
         boolean done = false;
         int x2;
         int y2;
+        int a;
 
         switch (direction)
         {
