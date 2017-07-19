@@ -137,6 +137,8 @@ public class GUI extends Application
      * Menu item for redoing the last undone move.
      */
     private MenuItem redo;
+    
+    private AI ai = new AI();
 
     ArrayList<Entry<String, Integer>> difficulties;
 
@@ -547,7 +549,7 @@ public class GUI extends Application
             case LIGHT:
                 if (difficultyLight > 0)
                 {
-                    game = AI.move(game, difficultyLight);
+                    game = ai.move(game, difficultyLight);
                     if (sound)
                     {
                         new MediaPlayer(tap).play();
@@ -559,7 +561,7 @@ public class GUI extends Application
             case DARK:
                 if (difficultyDark > 0)
                 {
-                    game = AI.move(game, difficultyDark);
+                    game = ai.move(game, difficultyDark);
                     if (sound)
                     {
                         new MediaPlayer(tap).play();

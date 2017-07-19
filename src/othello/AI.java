@@ -4,13 +4,13 @@ import java.util.concurrent.Semaphore;
 
 public class AI
 {
-    static Semaphore sem = new Semaphore(0);
+    Semaphore sem = new Semaphore(0);
     
-    static int threads = 0;
+    int threads = 0;
     
-    static Game best;
+    Point best = null;
 
-    static int bestScore;
+    int bestScore;
 
     // @formatter:off
     private static final int[][] MATRIX_NEW = {
@@ -39,7 +39,7 @@ public class AI
     // @formatter:on
 
 
-    public static Game move(Game game, int ply)
+    public Game move(Game game, int ply)
     {
         if (game.isGameOver())
         {
@@ -50,16 +50,13 @@ public class AI
             throw new IllegalArgumentException("ply has to be 1 or higher");
         }
         int correctPly = ply > game.getNumberOfFreeTiles() ? game.getNumberOfFreeTiles() : ply;
-        Game best = move(game, correctPly, game.getCurrentPlayer());
-        for (int i = 0; i < correctPly - 1; i++)
-        {
-            best.undo();
-        }
-        return best;
+        Point best = move(game, correctPly, game.getCurrentPlayer());
+        game.put(best.x, best.y);
+        return game;
     }
 
 
-    private static Game move(Game game, int ply, Player player)
+    private Point move(Game game, int ply, Player player)
     {
         threads = 0;
         bestScore = Integer.MIN_VALUE;
@@ -67,6 +64,8 @@ public class AI
         {
             for (int y = 0; y < Game.DIM; y++)
             {
+            	final int xCopy = x;
+            	final int yCopy = y;
                 Game clone = game.clone();
                 if (clone.put(x, y))
                 {
@@ -76,7 +75,7 @@ public class AI
                         int currentScore = evaluate(current, player, true);
                         if (currentScore >= bestScore)
                         {
-                            best = current;
+                            best = new Point(xCopy, yCopy);
                             bestScore = currentScore;
                         }
                         sem.release();
@@ -99,7 +98,7 @@ public class AI
     }
 
 
-    private static Game move(Game game, int ply, Player player, boolean max, int currentPly)
+    private Game move(Game game, int ply, Player player, boolean max, int currentPly)
     {
         if (currentPly == ply)
         {
@@ -142,7 +141,7 @@ public class AI
     }
 
 
-    private static int evaluate(Game game, Player player, boolean max)
+    private int evaluate(Game game, Player player, boolean max)
     {
         if (game.isGameOver())
         {
@@ -167,6 +166,18 @@ public class AI
             }
             return score;
         }
+    }
+    
+    private class Point {
+    	
+    	public final int x;
+    	
+    	public final int y;
+    	
+    	public Point(int x, int y) {
+    		this.x = x;
+    		this.y = y;
+    	}
     }
 
 }
